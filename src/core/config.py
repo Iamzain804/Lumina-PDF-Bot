@@ -18,9 +18,12 @@ class Config:
     # LLM Provider ("groq", "openai", or "openrouter")
     LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openrouter")
     
-    # Model Configuration
+    # Model Configuration (Standard model IDs)
     EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-    LLM_MODEL = "llama-3.3-70b-versatile"
+    
+    # Recommendation: Use OpenRouter free models if testing
+    # Or 'llama-3.1-8b-instant' for Groq
+    LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/llama-3.1-8b-instruct:free")
     
     # RAG Configuration
     CHUNK_SIZE = 1000
