@@ -8,6 +8,8 @@ from typing import Optional, List, Dict
 # Import custom modules
 from src.core.config import Config
 from src.handlers.llm_handler import GroqLLMHandler
+from src.handlers.openai_handler import OpenAILLMHandler
+from src.handlers.openrouter_handler import OpenRouterLLMHandler
 from src.engine.vector_store import DocumentVectorStore
 from src.services.chat_manager import ChatManager
 from src.engine.rag_engine import RAGEngine
@@ -143,8 +145,16 @@ def initialize_components():
                 # Load configuration
                 config = Config()
                 
-                # Initialize handlers
-                llm_handler = GroqLLMHandler(config)
+                # Initialize handlers based on configuration
+                if config.LLM_PROVIDER == "groq":
+                    llm_handler = GroqLLMHandler(config)
+                elif config.LLM_PROVIDER == "openai":
+                    llm_handler = OpenAILLMHandler(config)
+                elif config.LLM_PROVIDER == "openrouter":
+                    llm_handler = OpenRouterLLMHandler(config)
+                else:
+                    st.error(f"❌ Unsupported LLM Provider: {config.LLM_PROVIDER}")
+                    st.stop()
                 vector_store = DocumentVectorStore(config)
                 chat_manager = ChatManager()
                 

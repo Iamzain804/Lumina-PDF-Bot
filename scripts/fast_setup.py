@@ -36,7 +36,7 @@ LLM_PROVIDER={llm_provider}
     print(f"\n✅ .env file successfully create ho gayi hai!")
     print(f"✅ Provider set to: {llm_provider}")
     print("\nAb aap project run kar sakte hain:")
-    print("   streamlit run app.py")
+    print("   streamlit run src/api/app.py")
 
 if __name__ == "__main__":
     create_env_file()
