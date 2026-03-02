@@ -17,7 +17,7 @@ class OpenRouterLLMHandler:
         try:
             self.api_key = config.OPENROUTER_API_KEY
             self.base_url = "https://openrouter.ai/api/v1/chat/completions"
-            self.model = config.LLM_MODEL or "meta-llama/llama-3.2-3b-instruct:free"
+            self.model = config.LLM_MODEL or "google/gemini-2.0-flash-lite-preview-02-05:free"
             self.temperature = config.TEMPERATURE
             self.max_tokens = config.MAX_TOKENS
             

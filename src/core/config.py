@@ -23,7 +23,7 @@ class Config:
     
     # Recommendation: Use OpenRouter free models if testing
     # Or 'llama-3.1-8b-instant' for Groq
-    LLM_MODEL = os.getenv("LLM_MODEL", "meta-llama/llama-3.1-8b-instruct:free")
+    LLM_MODEL = os.getenv("LLM_MODEL", "google/gemini-2.0-flash-lite-preview-02-05:free")
     
     # RAG Configuration
     CHUNK_SIZE = 1000
