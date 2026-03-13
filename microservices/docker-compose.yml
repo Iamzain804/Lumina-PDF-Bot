@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # Document Processing Service
+  document-service:
+    build: ./document_service
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./data/documents:/app/data/documents
+    environment:
+      - SERVICE_NAME=document-service
+    networks:
+      - microservices-network
+
+  # Vector & Embeddings Service
+  vector-service:
+    build: ./vector_service
+    ports:
+      - "8002:8002"
+    volumes:
+      - ./data/vectors:/app/data/vectors
+    environment:
+      - SERVICE_NAME=vector-service
+    networks:
+      - microservices-network
+
+  # LLM Service
+  llm-service:
+    build: ./llm_service
+    ports:
+      - "8003:8003"
+    env_file:
+      - ../.env
+    environment:
+      - SERVICE_NAME=llm-service
+    networks:
+      - microservices-network
+
+  # Frontend Service
+  frontend-service:
+    build: ./frontend_service
+    ports:
+      - "8501:8501"
+    environment:
+      - DOCUMENT_SERVICE_URL=http://document-service:8001
+      - VECTOR_SERVICE_URL=http://vector-service:8002
+      - LLM_SERVICE_URL=http://llm-service:8003
+    depends_on:
+      - document-service
+      - vector-service
+      - llm-service
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
+
+volumes:
+  documents-data:
+  vectors-data:

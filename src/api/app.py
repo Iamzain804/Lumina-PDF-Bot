@@ -2,6 +2,17 @@
 
 import streamlit as st
 import json
+import sys
+import os
+from pathlib import Path
+
+# Dynamic root path fix for Streamlit
+project_root = str(Path(__file__).resolve().parent.parent.parent)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+if os.getcwd() not in sys.path:
+    sys.path.insert(0, os.getcwd())
+
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict
 
@@ -24,94 +35,150 @@ st.set_page_config(
 )
 
 # Custom CSS
+# Custom Premium CSS
 st.markdown("""
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+html, body, [class*="st-"] {
+    font-family: 'Outfit', sans-serif;
+}
+
 .main-header {
-    font-size: 2.5rem;
-    color: #1f77b4;
+    font-size: 3.5rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 0.5rem;
+    padding: 1rem 0;
 }
-.sidebar-section {
-    margin: 1rem 0;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    background-color: #f0f2f6;
+
+.stApp {
+    background-color: #0f172a;
 }
-.pdf-item {
-    padding: 0.5rem;
-    margin: 0.25rem 0;
-    border-radius: 0.25rem;
-    background-color: white;
+
+/* Sidebar styling */
+[data-testid="stSidebar"] {
+    background-color: #1e293b;
+    border-right: 1px solid #334155;
 }
-.success-msg {
-    color: #28a745;
-    font-weight: bold;
+
+.stButton>button {
+    width: 100%;
+    border-radius: 0.75rem;
+    border: none;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
-.error-msg {
-    color: #dc3545;
-    font-weight: bold;
+
+.stButton>button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
 }
-.chat-container {
-    max-height: 500px;
-    overflow-y: auto;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 0.5rem;
-    background-color: #fafafa;
-}
+
+/* Chat bubles styling */
 .user-message {
-    background-color: #007bff;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: white;
-    padding: 0.75rem;
-    border-radius: 1rem;
-    margin: 0.5rem 0;
-    margin-left: 20%;
-    text-align: right;
+    padding: 1.25rem;
+    border-radius: 1.5rem 1.5rem 0 1.5rem;
+    margin: 1rem 0;
+    margin-left: 15%;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
 .assistant-message {
-    background-color: #f8f9fa;
-    color: #333;
-    padding: 0.75rem;
-    border-radius: 1rem;
-    margin: 0.5rem 0;
-    margin-right: 20%;
-    border-left: 4px solid #28a745;
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 1.25rem;
+    border-radius: 1.5rem 1.5rem 1.5rem 0;
+    margin: 1rem 0;
+    margin-right: 15%;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    border: 1px solid #334155;
 }
+
 .source-pill {
-    background-color: #17a2b8;
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 1rem;
-    font-size: 0.8rem;
+    background: rgba(99, 102, 241, 0.1);
+    color: #818cf8;
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
     margin: 0.25rem;
     display: inline-block;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    font-weight: 600;
 }
+
 .timestamp {
-    font-size: 0.7rem;
-    color: #6c757d;
-    margin-top: 0.25rem;
+    font-size: 0.65rem;
+    color: #94a3b8;
+    margin-top: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
-.suggested-question {
-    background-color: #e9ecef;
-    border: 1px solid #ced4da;
-    border-radius: 1rem;
-    padding: 0.5rem 1rem;
-    margin: 0.25rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.suggested-question:hover {
-    background-color: #007bff;
-    color: white;
-}
+
 .welcome-section {
     text-align: center;
-    padding: 2rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 3rem;
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid #334155;
     color: white;
+    border-radius: 2rem;
+    margin: 2rem 0;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.welcome-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(to right, #818cf8, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Card-like items for PDF list */
+.pdf-item {
+    padding: 1rem;
+    margin: 0.75rem 0;
     border-radius: 1rem;
-    margin: 1rem 0;
+    background: #1e293b;
+    border: 1px solid #334155;
+    transition: all 0.2s ease;
+}
+
+.pdf-item:hover {
+    border-color: #6366f1;
+    background: #243147;
+}
+
+/* Status indicators */
+.success-msg { color: #10b981; font-weight: 600; }
+.error-msg { color: #ef4444; font-weight: 600; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -225,17 +292,21 @@ def display_chat_message(role: str, content: str, metadata: Dict = None):
     if role == "user":
         st.markdown(f"""
         <div class="user-message">
-            👤 {content}
+            <div style="font-weight: 600; margin-bottom: 0.25rem;">You</div>
+            {content}
             <div class="timestamp">{format_timestamp(timestamp)}</div>
         </div>
         """, unsafe_allow_html=True)
     else:
         # Clean HTML from content and display sources separately
         clean_content = content.replace('<', '&lt;').replace('>', '&gt;')
+        sources_html = display_sources(sources)
         
         st.markdown(f"""
         <div class="assistant-message">
-            🤖 {clean_content}
+            <div style="font-weight: 600; margin-bottom: 0.25rem; color: #818cf8;">Lumina AI</div>
+            {clean_content}
+            {sources_html}
             <div class="timestamp">{format_timestamp(timestamp)}</div>
         </div>
         """, unsafe_allow_html=True)
@@ -369,9 +440,13 @@ def display_welcome_screen():
     """Display welcome screen when no document is selected."""
     st.markdown("""
     <div class="welcome-section">
-        <h1>🚀 Welcome to Smart Document Chatbot</h1>
-        <h3>Chat with your documents using AI</h3>
-        <p>Upload PDF, Word, Text, or Markdown documents and start asking questions!</p>
+        <h1>✨ Lumina-PDF-Bot</h1>
+        <p style="font-size: 1.2rem; opacity: 0.9;">Transform your documents into intelligent conversations</p>
+        <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 1rem;">
+            <span style="background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.9rem;">⚡ Lightning Fast</span>
+            <span style="background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.9rem;">🔒 Secure & Private</span>
+            <span style="background: rgba(255,255,255,0.1); padding: 0.5rem 1rem; border-radius: 999px; font-size: 0.9rem;">🤖 RAG Powered</span>
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -661,6 +736,16 @@ def display_current_pdf_info():
                     st.session_state.current_pdf
                 )
                 st.write(summary)
+            
+            # Clear current chat only
+            if st.button("🗑️ Clear Chat History", help="Clear only the chat messages for this document"):
+                try:
+                    st.session_state.rag_engine.chat_manager.clear_history(st.session_state.current_pdf)
+                    st.session_state.chat_history = []
+                    st.success("✅ Chat history cleared for this document!")
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"❌ Error clearing history: {str(e)}")
                 
     except Exception as e:
         st.error(f"❌ Error loading document info: {str(e)}")
@@ -767,9 +852,10 @@ def main():
         clear_all_data()
     
     # Main content area
-    st.markdown('<h1 class="main-header">📄 Smart Document Chatbot</h1>', unsafe_allow_html=True)
-    st.markdown('<p style="text-align: center; font-size: 1.2rem; color: #666;">Chat with your documents using AI</p>', unsafe_allow_html=True)
-    st.markdown("---")
+    # Main content area
+    st.markdown('<h1 class="main-header">Lumina-PDF-Bot</h1>', unsafe_allow_html=True)
+    st.markdown('<p style="text-align: center; font-size: 1.1rem; color: #94a3b8; margin-bottom: 2rem;">Intelligent AI conversations powered by RAG technology</p>', unsafe_allow_html=True)
+    st.markdown('<div style="background: linear-gradient(90deg, transparent, #334155, transparent); height: 1px; width: 100%; margin: 1rem 0;"></div>', unsafe_allow_html=True)
     
     # Check if PDF is selected
     if not st.session_state.current_pdf:

@@ -14,13 +14,14 @@ try:
 except ImportError:
     DOCX_AVAILABLE = False
 
-# Try to import advanced embeddings, fallback to lightweight
+# Try to import advanced embeddings, but catch ALL errors (especially DLL failures on Windows)
 try:
     from langchain_community.embeddings import HuggingFaceEmbeddings
     from langchain_community.vectorstores import FAISS
     import sentence_transformers
     ADVANCED_AVAILABLE = True
-except ImportError:
+except Exception:
+    # If any error occurs (ImportError, OSError/DLL, etc.), we fall back to lightweight
     ADVANCED_AVAILABLE = False
 
 # Always import lightweight fallback
