@@ -11,7 +11,14 @@ class Config:
     """Configuration class for PDF chatbot application."""
     
     # API Configuration
-    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")  # legacy single key support
+    GROQ_API_KEYS = [
+        key for key in [
+            os.getenv("GROQ_API_KEY_1"),
+            os.getenv("GROQ_API_KEY_2"),
+            os.getenv("GROQ_API_KEY"),   # fallback: old single key
+        ] if key
+    ]
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
     
@@ -46,8 +53,8 @@ class Config:
     @classmethod
     def validate_config(cls):
         """Validate configuration and create directories."""
-        if cls.LLM_PROVIDER == "groq" and not cls.GROQ_API_KEY:
-            raise ValueError("GROQ_API_KEY not found in environment variables")
+        if cls.LLM_PROVIDER == "groq" and not cls.GROQ_API_KEYS:
+            raise ValueError("No GROQ API keys found. Set GROQ_API_KEY_1 in .env")
         elif cls.LLM_PROVIDER == "openai" and not cls.OPENAI_API_KEY:
             raise ValueError("OPENAI_API_KEY not found in environment variables")
         elif cls.LLM_PROVIDER == "openrouter" and not cls.OPENROUTER_API_KEY:
