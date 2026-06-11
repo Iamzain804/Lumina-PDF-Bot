@@ -19,16 +19,21 @@ class Config:
     LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openrouter")
     
     # Model Configuration (Standard model IDs)
-    EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-    
+    EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+
+    # Migration flag — set True to enable v2 semantic embeddings
+    # Phase 2: False (v1 default) → Phase 3: True (v2 active)
+    USE_V2_EMBEDDINGS = os.getenv("USE_V2_EMBEDDINGS", "false").lower() == "true"
+
     # Recommendation: Use OpenRouter free models if testing
     # Or 'llama-3.1-8b-instant' for Groq
     LLM_MODEL = os.getenv("LLM_MODEL", "google/gemini-2.0-flash-lite-preview-02-05:free")
-    
+
     # RAG Configuration
-    CHUNK_SIZE = 1000
-    CHUNK_OVERLAP = 200
-    TOP_K_RESULTS = 4
+    CHUNK_SIZE = 512
+    CHUNK_OVERLAP = 50
+    TOP_K_RESULTS = 6
+    RETRIEVAL_SCORE_THRESHOLD = 0.25
     
     # LLM Parameters
     TEMPERATURE = 0.3

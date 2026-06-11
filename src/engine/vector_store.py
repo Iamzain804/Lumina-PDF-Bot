@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import PyPDF2
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # Try to import docx for Word documents
 try:
@@ -29,25 +29,31 @@ from src.engine.lightweight_embeddings import LightweightEmbeddings
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
+
+def build_vector_store(config):
+    """Factory — returns V2 if flag is on, V1 otherwise.
+
+    All callers (app.py) use this instead of instantiating directly.
+    Swap happens here, nowhere else.
+    """
+    if getattr(config, "USE_V2_EMBEDDINGS", False):
+        from src.engine.vector_store_v2 import DocumentVectorStoreV2
+        print("[VectorStore] V2 - semantic embeddings + FAISS + hybrid search")
+        return DocumentVectorStoreV2(config)
+    print("[VectorStore] V1 - TF-IDF (legacy)")
+    return DocumentVectorStore(config)
+
+
 class DocumentVectorStore:
-    """Multi-format document processing and vector database management."""
-    
+    """V1 — TF-IDF based vector store. Kept as fallback during migration."""
+
     def __init__(self, config):
-        """Initialize embedding model and configuration.
-        
-        Args:
-            config: Configuration object with model settings
-        """
         try:
             self.config = config
-            
-            # Always use lightweight embeddings to avoid dependency issues
-            print("Using lightweight TF-IDF embeddings (PyTorch-free)")
             self.embeddings = LightweightEmbeddings()
             self.use_faiss = False
             self.vectors = None
             self.texts = None
-            
             self.text_splitter = RecursiveCharacterTextSplitter(
                 chunk_size=config.CHUNK_SIZE,
                 chunk_overlap=config.CHUNK_OVERLAP

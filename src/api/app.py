@@ -21,7 +21,7 @@ from src.core.config import Config
 from src.handlers.llm_handler import GroqLLMHandler
 from src.handlers.openai_handler import OpenAILLMHandler
 from src.handlers.openrouter_handler import OpenRouterLLMHandler
-from src.engine.vector_store import DocumentVectorStore
+from src.engine.vector_store import build_vector_store
 from src.services.chat_manager import ChatManager
 from src.engine.rag_engine import RAGEngine
 from src.utils.utils import validate_pdf, get_file_size
@@ -222,7 +222,7 @@ def initialize_components():
                 else:
                     st.error(f"❌ Unsupported LLM Provider: {config.LLM_PROVIDER}")
                     st.stop()
-                vector_store = DocumentVectorStore(config)
+                vector_store = build_vector_store(config)
                 chat_manager = ChatManager()
                 
                 # Create RAG engine
